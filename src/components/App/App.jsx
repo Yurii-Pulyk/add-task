@@ -1,21 +1,26 @@
-import clsx from 'clsx';
-import css from './Button.module.css';
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppBar } from '../AppBar/AppBar';
+import { TaskForm } from '../TaskForm/TaskForm';
+import { TaskList } from '../TaskList/TaskList';
+import { fetchTasks } from '../../redux/operations';
+import css from './App.module.css';
 
-export const Button = ({
-  selected = false,
-  type = 'button',
-  children,
-  ...otherProps
-}) => {
+export default function App() {
+  const dispatch = useDispatch();
+  const isLoading = useSelector(state => state.tasks.isLoading);
+  const error = useSelector(state => state.tasks.error);
+
+  useEffect(() => {
+    dispatch(fetchTasks());
+  }, [dispatch]);
+
   return (
-    <button
-      className={clsx(css.btn, {
-        [css.isSelected]: selected,
-      })}
-      type={type}
-      {...otherProps}
-    >
-      {children}
-    </button>
+    <div className={css.container}>
+      <AppBar />
+      <TaskForm />
+      {isLoading && !error && <b>Request in progress...</b>}
+      <TaskList />
+    </div>
   );
-};
+}
